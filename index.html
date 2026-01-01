@@ -5,45 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ドキドキ！お年玉ルーレット</title>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; text-align: center; background: #fdf2f2; padding: 20px; color: #333; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 4px solid #e63946; }
-        h1 { color: #e63946; font-size: 1.5rem; margin-bottom: 20px; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; text-align: center; background: #fff5f5; padding: 20px; color: #333; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 4px solid #d62828; }
+        h1 { color: #d62828; font-size: 1.4rem; margin-bottom: 20px; letter-spacing: 1px; }
         
-        /* コース選択ボタン */
-        .course-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .btn-course { padding: 15px; border: 2px solid #ddd; border-radius: 15px; cursor: pointer; background: #fff; font-weight: bold; transition: 0.3s; }
-        .btn-course.active { background: #e63946; color: white; border-color: #e63946; transform: scale(1.05); }
+        /* コース選択ボタン（3列） */
+        .course-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .btn-course { padding: 12px 5px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; background: #fff; font-weight: bold; font-size: 0.9rem; transition: 0.3s; color: #666; }
+        .btn-course.active { background: #d62828; color: white; border-color: #d62828; transform: scale(1.05); }
 
         /* ルーレット本体 */
         .roulette-box { position: relative; margin: 30px auto; width: 300px; height: 300px; }
-        canvas { width: 100%; height: 100%; transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1); }
-        .arrow { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #333; z-index: 10; }
+        canvas { width: 100%; height: 100%; transition: transform 5s cubic-bezier(0.1, 0, 0.2, 1); }
+        .arrow { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 40px solid #333; z-index: 10; }
 
-        /* 操作エリア */
-        .controls { margin-top: 20px; }
-        .base-input { margin-bottom: 15px; display: none; }
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 80%; font-size: 1rem; text-align: center; }
-        .btn-spin { background: #f1faee; border: 3px solid #e63946; color: #e63946; padding: 15px 40px; border-radius: 50px; font-size: 1.5rem; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 5px 0 #d62828; margin-top: 10px; }
+        /* 操作・結果 */
+        #result { margin: 20px 0; font-size: 1.8rem; font-weight: bold; color: #d62828; min-height: 2.5rem; border-bottom: 2px dashed #eee; padding-bottom: 10px; }
+        .btn-spin { background: #fdf2f2; border: 3px solid #d62828; color: #d62828; padding: 15px; border-radius: 50px; font-size: 1.4rem; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 5px 0 #b91d1d; }
         .btn-spin:active { transform: translateY(3px); box-shadow: none; }
         .btn-spin:disabled { background: #eee; border-color: #ccc; color: #999; box-shadow: none; }
-
-        #result { margin-top: 20px; font-size: 2rem; font-weight: bold; color: #e63946; min-height: 2.5rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🧧 ドキドキお年玉ルーレット</h1>
+    <h1>🧧 ドキドキ！お年玉ルーレット</h1>
 
-    <div class="course-selector" id="selectors">
+    <div class="course-selector">
         <button class="btn-course active" onclick="selectCourse('sakuya')">さくや<br>コース</button>
         <button class="btn-course" onclick="selectCourse('reiya')">れいや<br>コース</button>
         <button class="btn-course" onclick="selectCourse('souya')">そうや<br>コース</button>
-        <button class="btn-course" onclick="selectCourse('extra')">〇〇<br>コース</button>
-    </div>
-
-    <div id="baseInputArea" class="base-input">
-        <input type="number" id="baseAmount" placeholder="ベース金額を入力（例：2000）">
     </div>
 
     <div class="roulette-box">
@@ -53,104 +44,111 @@
 
     <div id="result"></div>
 
-    <div class="controls">
-        <button id="spinBtn" class="btn-spin" onclick="spin()">スタート！</button>
-    </div>
+    <button id="spinBtn" class="btn-spin" onclick="spin()">ルーレット開始！</button>
 </div>
 
 <script>
-    // コース設定
     const courses = {
-        sakuya: { items: ["3,000円", "4,000円", "5,000円", "もう一回"], weights: [40, 30, 20, 10] },
-        reiya:  { items: ["5,000円", "6,000円", "7,000円", "もう一回"], weights: [40, 30, 20, 10] },
-        souya:  { items: ["7,000円", "8,000円", "9,000円", "もう一回"], weights: [40, 30, 20, 10] },
-        extra:  { items: ["1,000円", "ベース", "10,000円", "もう一回"], weights: [30, 30, 30, 10] }
+        sakuya: { 
+            items: ["5,000円", "6,000円", "7,000円", "もう一回"], 
+            weights: [40, 30, 20, 10] // 下から40%, 30%, 20%, 10%
+        },
+        reiya: { 
+            items: ["7,000円", "8,000円", "9,000円", "もう一回"], 
+            weights: [40, 30, 20, 10] // 下から40%, 30%, 20%, 10%
+        },
+        souya: { 
+            items: ["1,000円", "10,000円", "また来年がんばろう"], 
+            weights: [33.3, 33.3, 33.4] // 等分設定（50:25:25にしたい場合は [25, 25, 50] に変更）
+        }
     };
 
     let currentCourse = 'sakuya';
     let currentRotation = 0;
-    const colors = ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf"];
+    const colors = ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff"];
     
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const resultDiv = document.getElementById('result');
     const spinBtn = document.getElementById('spinBtn');
 
-    // コース切り替え
     function selectCourse(courseId) {
+        if (spinBtn.disabled) return;
         currentCourse = courseId;
-        // UI更新
-        document.querySelectorAll('.btn-course').forEach(btn => btn.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        
-        // 〇〇コースのときだけベース入力を表示
-        document.getElementById('baseInputArea').style.display = (courseId === 'extra') ? 'block' : 'none';
-        
+        document.querySelectorAll('.btn-course').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText.includes(courseId === 'sakuya' ? 'さくや' : courseId === 'reiya' ? 'れいや' : 'そうや')) {
+                btn.classList.add('active');
+            }
+        });
         resultDiv.innerText = "";
         draw();
     }
 
-    // 描画
     function draw() {
-        const items = courses[currentCourse].items;
-        const arc = (Math.PI * 2) / items.length;
+        const config = courses[currentCourse];
+        const totalWeight = config.weights.reduce((a, b) => a + b, 0);
+        let startAngle = -Math.PI / 2; // 真上(12時方向)から描画開始
         
         ctx.clearRect(0, 0, 300, 300);
-        items.forEach((text, i) => {
-            const angle = i * arc;
+        
+        config.items.forEach((text, i) => {
+            const arc = (config.weights[i] / totalWeight) * (Math.PI * 2);
+            
             ctx.fillStyle = colors[i % colors.length];
             ctx.beginPath();
             ctx.moveTo(150, 150);
-            ctx.arc(150, 150, 145, angle, angle + arc);
+            ctx.arc(150, 150, 145, startAngle, startAngle + arc);
             ctx.fill();
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
             ctx.stroke();
 
             ctx.save();
             ctx.translate(150, 150);
-            ctx.rotate(angle + arc / 2);
+            ctx.rotate(startAngle + arc / 2);
             ctx.fillStyle = "#333";
-            ctx.font = "bold 16px sans-serif";
+            ctx.font = "bold 15px sans-serif";
             ctx.textAlign = "right";
-            ctx.fillText(text, 130, 10);
+            ctx.fillText(text, 135, 5);
             ctx.restore();
+
+            startAngle += arc;
         });
     }
 
-    // 回転処理
     function spin() {
         spinBtn.disabled = true;
-        resultDiv.innerText = "まわっています...";
+        resultDiv.innerText = "抽選中...";
 
         const config = courses[currentCourse];
-        const weights = config.weights;
-        const totalWeight = weights.reduce((a, b) => a + b, 0);
+        const totalWeight = config.weights.reduce((a, b) => a + b, 0);
         
-        // 重みに基づいて当選を決定
         let random = Math.random() * totalWeight;
         let selectedIndex = 0;
-        for (let i = 0; i < weights.length; i++) {
-            if (random < weights[i]) {
+        let cumulativeWeight = 0;
+        for (let i = 0; i < config.weights.length; i++) {
+            cumulativeWeight += config.weights[i];
+            if (random < cumulativeWeight) {
                 selectedIndex = i;
                 break;
             }
-            random -= weights[i];
         }
 
-        // 停止位置の計算（針が上(270度)にある前提）
-        const segmentAngle = 360 / config.items.length;
-        const targetAngle = 270 - (segmentAngle * selectedIndex) - (segmentAngle / 2);
-        const extraSpins = 360 * 5; // 5回転させる
-        currentRotation += extraSpins + (targetAngle - (currentRotation % 360)) + 360;
+        let weightSumBefore = 0;
+        for (let i = 0; i < selectedIndex; i++) {
+            weightSumBefore += config.weights[i];
+        }
+        const targetMidWeight = weightSumBefore + (config.weights[selectedIndex] / 2);
+        const targetAngleDeg = (targetMidWeight / totalWeight) * 360;
+        
+        const extraSpins = 360 * 8; // 8回転
+        currentRotation += extraSpins + (360 - (currentRotation % 360)) - targetAngleDeg;
 
         canvas.style.transform = `rotate(${currentRotation}deg)`;
 
-        // アニメーション終了後の処理
         setTimeout(() => {
-            let finalResult = config.items[selectedIndex];
-            if (finalResult === "ベース") {
-                const base = document.getElementById('baseAmount').value || "？？？";
-                finalResult = base + "円";
-            }
+            const finalResult = config.items[selectedIndex];
             resultDiv.innerText = "結果： " + finalResult;
             spinBtn.disabled = false;
         }, 5000);
