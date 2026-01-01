@@ -1,67 +1,103 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.2">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カスタムルーレット</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f8f9fa; padding: 20px; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        canvas { width: 100%; max-width: 300px; height: auto; margin: 20px 0; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
+        .inputs { margin-top: 20px; text-align: left; }
+        input { width: 70%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .btn-add { background: #28a745; color: white; }
+        .btn-spin { background: #007bff; color: white; width: 100%; font-size: 1.2rem; margin-top: 10px; padding: 12px; }
+        .item-list { list-style: none; padding: 0; margin-top: 10px; }
+        .item-list li { display: flex; justify-content: space-between; background: #eee; margin: 5px 0; padding: 5px 10px; border-radius: 3px; }
+        .btn-del { background: #dc3545; color: white; padding: 2px 8px; font-size: 0.8rem; }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;家族でルーレット&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body { text-align: center; font-family: sans-serif; background: #f0f0f0; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#canvas { background: white; border-radius: 50%; border: 5px solid #333; margin: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>button { padding: 15px 30px; font-size: 20px; cursor: pointer; border-radius: 10px; border: none; background: #007bff; color: white; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;運試しルーレット&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;canvas id="canvas" width="300" height="300"&gt;&lt;/canvas&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="spin()"&gt;スタート！&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const canvas = document.getElementById('canvas');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const ctx = canvas.getContext('2d');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const items = ["あたり", "はずれ", "おやつ", "掃除当番", "もう一回"];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const colors = ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff"];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let angle = 0;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function draw() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const step = 360 / items.length;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>items.forEach((item, i) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.beginPath();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillStyle = colors[i % colors.length];</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.moveTo(150, 150);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.arc(150, 150, 150, (step * i - 90) * Math.PI / 180, (step * (i + 1) - 90) * Math.PI / 180);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.fill();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.save();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.translate(150, 150);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.rotate((step * i + step / 2 - 90) * Math.PI / 180);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillStyle = "black";</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillText(item, 70, 5);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.restore();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function spin() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const addAngle = Math.floor(Math.random() * 360) + 1440; // 4回転以上</p>
-<p class="p1"><span class="Apple-converted-space">            </span>angle += addAngle;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>canvas.style.transition = "transform 3s cubic-bezier(0.1, 0, 0.2, 1)";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>canvas.style.transform = `rotate(${angle}deg)`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>draw();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<div class="container">
+    <h2>🎡 カスタムルーレット</h2>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    
+    <button class="btn-spin" onclick="spin()">スタート！</button>
+
+    <div class="inputs">
+        <input type="text" id="newItem" placeholder="項目名を追加...">
+        <button class="btn-add" onclick="addItem()">追加</button>
+        <ul id="itemList" class="item-list"></ul>
+    </div>
+</div>
+
+<script>
+    let items = ["あたり", "はずれ", "おやつ", "掃除"];
+    const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
+    let currentRotation = 0;
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    function draw() {
+        const arc = Math.PI * 2 / items.length;
+        ctx.clearRect(0, 0, 300, 300);
+        items.forEach((text, i) => {
+            const angle = i * arc;
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.beginPath();
+            ctx.moveTo(150, 150);
+            ctx.arc(150, 150, 140, angle, angle + arc);
+            ctx.fill();
+            
+            ctx.save();
+            ctx.translate(150, 150);
+            ctx.rotate(angle + arc / 2);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 16px sans-serif";
+            ctx.fillText(text, 60, 5);
+            ctx.restore();
+        });
+    }
+
+    function addItem() {
+        const val = document.getElementById('newItem').value;
+        if (val) {
+            items.push(val);
+            document.getElementById('newItem').value = "";
+            updateList();
+            draw();
+        }
+    }
+
+    function removeItem(index) {
+        if (items.length > 2) {
+            items.splice(index, 1);
+            updateList();
+            draw();
+        } else {
+            alert("最低2項目必要です");
+        }
+    }
+
+    function updateList() {
+        const list = document.getElementById('itemList');
+        list.innerHTML = items.map((item, i) => 
+            `<li>${item} <button class="btn-del" onclick="removeItem(${i})">削除</button></li>`
+        ).join('');
+    }
+
+    function spin() {
+        const extra = Math.floor(Math.random() * 360) + 1800; 
+        currentRotation += extra;
+        canvas.style.transform = `rotate(${currentRotation}deg)`;
+    }
+
+    updateList();
+    draw();
+</script>
+
 </body>
 </html>
