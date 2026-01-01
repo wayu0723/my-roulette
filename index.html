@@ -26,7 +26,7 @@
 <body>
 
 <div class="container">
-    <h1>🧧 ドキドキ！お年玉ルーレット</h1>
+    <h1>🧧 お年玉倍率ルーレット</h1>
 
     <div class="course-selector">
         <button class="btn-course active" onclick="selectCourse('sakuya')">さくや<br>コース</button>
@@ -123,4 +123,54 @@
             } 
             // 通常の場合
             else {
-                ctx.font = "bold
+                ctx.font = "bold 15px sans-serif";
+                ctx.fillText(text, 135, 5);
+            }
+            
+            ctx.restore();
+            startAngle += arc;
+        });
+    }
+
+    function spin() {
+        spinBtn.disabled = true;
+        resultDiv.innerText = "抽選中...";
+
+        const config = courses[currentCourse];
+        const totalWeight = config.weights.reduce((a, b) => a + b, 0);
+        
+        let random = Math.random() * totalWeight;
+        let selectedIndex = 0;
+        let cumulativeWeight = 0;
+        for (let i = 0; i < config.weights.length; i++) {
+            cumulativeWeight += config.weights[i];
+            if (random < cumulativeWeight) {
+                selectedIndex = i;
+                break;
+            }
+        }
+
+        let weightSumBefore = 0;
+        for (let i = 0; i < selectedIndex; i++) {
+            weightSumBefore += config.weights[i];
+        }
+        const targetMidWeight = weightSumBefore + (config.weights[selectedIndex] / 2);
+        const targetAngleDeg = (targetMidWeight / totalWeight) * 360;
+        
+        const extraSpins = 360 * 10; // 10回転（演出用に多めに）
+        currentRotation += extraSpins + (360 - (currentRotation % 360)) - targetAngleDeg;
+
+        canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+        setTimeout(() => {
+            const finalResult = config.items[selectedIndex];
+            resultDiv.innerText = "結果： " + finalResult;
+            spinBtn.disabled = false;
+        }, 5000);
+    }
+
+    draw();
+</script>
+
+</body>
+</html>
